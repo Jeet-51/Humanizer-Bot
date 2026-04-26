@@ -14,41 +14,55 @@ function calculateAIScore(text: string): number {
 
   if (words.length === 0) return 0;
 
-  // 1. Burstiness — AI has very uniform sentence lengths (low variance)
+  // 1. Burstiness — AI writes uniformly-lengthed sentences (low variance = high AI score)
+  //    CV threshold raised to 0.65 so that moderately-varied AI text is still flagged.
   const lengths = sentences.map((s) => s.trim().split(/\s+/).length);
   const avg = lengths.reduce((a, b) => a + b, 0) / lengths.length;
   const variance =
     lengths.reduce((sum, l) => sum + Math.pow(l - avg, 2), 0) / lengths.length;
   const cv = avg > 0 ? Math.sqrt(variance) / avg : 0;
-  const burstinessScore = Math.min(1, cv / 0.45); // 1 = human, 0 = AI
+  const burstinessScore = Math.min(1, cv / 0.65); // 1 = human-like, 0 = AI-like
 
-  // 2. AI signature words
+  // 2. AI signature words — expanded list catches Gemini's preferred substitutions
   const aiWords = new Set([
+    // Transitional connectors
     "furthermore", "moreover", "additionally", "consequently",
     "nevertheless", "therefore", "thus", "hence", "subsequently",
+    "notably", "importantly", "evidently", "undoubtedly",
+    // Corporate / buzzword verbs
     "utilize", "utilization", "facilitate", "implement", "leverage",
-    "paradigm", "synergy", "robust", "comprehensive", "imperative",
-    "crucial", "significant", "substantial", "optimal", "innovative",
-    "streamline", "seamlessly", "holistic", "scalable", "dynamic",
-    "proactive", "actionable", "transformative", "pivotal", "underscore",
+    "streamline", "optimize", "prioritize", "spearhead", "underscore",
+    "foster", "cultivate", "harness", "catalyze", "revolutionize",
+    "empower", "enable", "enhance", "ensure", "address",
+    // AI-favourite adjectives / adverbs
+    "robust", "comprehensive", "imperative", "crucial", "significant",
+    "substantial", "optimal", "innovative", "seamlessly", "holistic",
+    "scalable", "dynamic", "proactive", "actionable", "transformative",
+    "pivotal", "groundbreaking", "multifaceted", "nuanced", "inherent",
+    "vital", "paramount", "indispensable", "exemplary", "commendable",
+    // AI-favourite nouns
+    "paradigm", "synergy", "ecosystem", "landscape", "framework",
+    "infrastructure", "stakeholder", "delve", "realm", "tapestry",
   ]);
   const aiWordCount = words.filter((w) => aiWords.has(w)).length;
-  const aiWordScore = 1 - Math.min(1, (aiWordCount / words.length) * 25);
+  // Raised multiplier: 3+ AI words per 100 = fully flagged (was 4+)
+  const aiWordScore = 1 - Math.min(1, (aiWordCount / words.length) * 33);
 
-  // 3. Vocabulary richness (type-token ratio)
+  // 3. Vocabulary richness (type-token ratio) — less weight since AI can have high TTR too
   const uniqueWords = new Set(words).size;
   const ttr = uniqueWords / words.length;
   const richness = Math.min(1, ttr * 1.5);
 
-  // 4. Avg sentence length (AI likes long structured sentences)
-  const sentLenScore = avg > 22 ? Math.max(0, 1 - (avg - 22) / 22) : 1;
+  // 4. Avg sentence length — reduced weight (least reliable signal)
+  const sentLenScore = avg > 20 ? Math.max(0, 1 - (avg - 20) / 20) : 1;
 
-  // Human score → invert to get AI score
+  // Weights: buzzwords dominate (55%), burstiness secondary (30%),
+  //          richness (10%) and length (5%) as minor signals.
   const humanScore =
-    burstinessScore * 0.35 +
-    aiWordScore * 0.35 +
-    richness * 0.15 +
-    sentLenScore * 0.15;
+    burstinessScore * 0.30 +
+    aiWordScore     * 0.55 +
+    richness        * 0.10 +
+    sentLenScore    * 0.05;
 
   return Math.min(100, Math.max(0, Math.round((1 - humanScore) * 100)));
 }
@@ -131,7 +145,7 @@ export function AIScoreMeter({ originalText, humanizedText }: AIScoreMeterProps)
               Lower % = less detectable as AI
             </p>
           </div>
-          {improvement > 0 && (
+          {improvement >= 3 && (
             <div className="ml-auto flex items-center gap-1.5 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-700 rounded-full px-3 py-1">
               <ShieldCheck className="h-4 w-4 text-green-600 dark:text-green-400" />
               <span className="text-xs font-semibold text-green-700 dark:text-green-300">
@@ -139,10 +153,16 @@ export function AIScoreMeter({ originalText, humanizedText }: AIScoreMeterProps)
               </span>
             </div>
           )}
-          {improvement <= 0 && (
+          {improvement > -3 && improvement < 3 && (
+            <div className="ml-auto flex items-center gap-1.5 bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-700 rounded-full px-3 py-1">
+              <ShieldAlert className="h-4 w-4 text-yellow-500 dark:text-yellow-400" />
+              <span className="text-xs font-semibold text-yellow-700 dark:text-yellow-300">Similar score</span>
+            </div>
+          )}
+          {improvement <= -3 && (
             <div className="ml-auto flex items-center gap-1.5 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 rounded-full px-3 py-1">
               <ShieldAlert className="h-4 w-4 text-red-500 dark:text-red-400" />
-              <span className="text-xs font-semibold text-red-600 dark:text-red-300">No improvement</span>
+              <span className="text-xs font-semibold text-red-600 dark:text-red-300">Score worsened</span>
             </div>
           )}
         </div>
