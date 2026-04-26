@@ -2,13 +2,30 @@
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 import { Link, useLocation } from "react-router-dom";
-import { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Menu, X, Moon, Sun } from "lucide-react";
 
 export function Navbar() {
   const { user, signOut } = useAuth();
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isDark, setIsDark] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("theme") === "dark";
+    }
+    return false;
+  });
+
+  useEffect(() => {
+    const root = document.documentElement;
+    if (isDark) {
+      root.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    } else {
+      root.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    }
+  }, [isDark]);
 
   const isActive = (path: string) => {
     return location.pathname === path;
@@ -74,7 +91,19 @@ export function Navbar() {
             </Link>
           </nav>
         </div>
-        <div className="hidden md:flex items-center gap-4">
+        <div className="hidden md:flex items-center gap-3">
+          {/* Dark / Light toggle */}
+          <button
+            onClick={() => setIsDark(!isDark)}
+            className="w-9 h-9 flex items-center justify-center rounded-full border border-border hover:bg-muted transition-colors"
+            aria-label="Toggle dark mode"
+          >
+            {isDark
+              ? <Sun className="h-4 w-4 text-yellow-500" />
+              : <Moon className="h-4 w-4 text-slate-600" />
+            }
+          </button>
+
           {user ? (
             <>
               <Link to="/dashboard">
