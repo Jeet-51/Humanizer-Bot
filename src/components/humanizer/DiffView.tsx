@@ -62,9 +62,9 @@ function diffWords(original: string, humanized: string): DiffToken[] {
 function tokenStyle(type: DiffToken["type"]) {
   switch (type) {
     case "added":
-      return "bg-green-100 text-green-800 rounded px-0.5 mx-0.5";
+      return "bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-300 rounded px-0.5 mx-0.5";
     case "removed":
-      return "bg-red-100 text-red-700 line-through rounded px-0.5 mx-0.5 opacity-70";
+      return "bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300 line-through rounded px-0.5 mx-0.5 opacity-70";
     default:
       return "mx-0.5";
   }
@@ -106,12 +106,12 @@ export function DiffView({ originalText, humanizedText }: DiffViewProps) {
           {/* Stats */}
           <div className="ml-auto flex items-center gap-3 text-xs flex-wrap">
             <span className="flex items-center gap-1.5">
-              <span className="inline-block w-3 h-3 rounded-sm bg-green-200 border border-green-400" />
-              <span className="font-medium text-green-700">+{added} added</span>
+              <span className="inline-block w-3 h-3 rounded-sm bg-green-200 dark:bg-green-700 border border-green-400 dark:border-green-500" />
+              <span className="font-medium text-green-700 dark:text-green-400">+{added} added</span>
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="inline-block w-3 h-3 rounded-sm bg-red-200 border border-red-400" />
-              <span className="font-medium text-red-700">-{removed} removed</span>
+              <span className="inline-block w-3 h-3 rounded-sm bg-red-200 dark:bg-red-800 border border-red-400 dark:border-red-500" />
+              <span className="font-medium text-red-700 dark:text-red-400">-{removed} removed</span>
             </span>
             <span className="flex items-center gap-1.5">
               <span className="inline-block w-3 h-3 rounded-sm bg-muted border border-muted-foreground/30" />
@@ -124,7 +124,7 @@ export function DiffView({ originalText, humanizedText }: DiffViewProps) {
         </div>
 
         {/* Diff Text */}
-        <div className="rounded-xl border bg-white/60 p-4 max-h-64 overflow-y-auto text-sm leading-7">
+        <div className="rounded-xl border bg-white/60 dark:bg-slate-800/60 p-4 max-h-64 overflow-y-auto text-sm leading-7">
           <p className="whitespace-pre-wrap break-words">
             {tokens.map((token, idx) => (
               <span key={idx} className={tokenStyle(token.type)}>
@@ -137,10 +137,10 @@ export function DiffView({ originalText, humanizedText }: DiffViewProps) {
         {/* Legend */}
         <div className="mt-3 flex gap-4 text-xs text-muted-foreground">
           <span>
-            <span className="bg-green-100 text-green-800 rounded px-1">green</span> = new words
+            <span className="bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-300 rounded px-1">green</span> = new words
           </span>
           <span>
-            <span className="bg-red-100 text-red-700 line-through rounded px-1">red</span> = removed words
+            <span className="bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300 line-through rounded px-1">red</span> = removed words
           </span>
           <span>plain = unchanged</span>
         </div>

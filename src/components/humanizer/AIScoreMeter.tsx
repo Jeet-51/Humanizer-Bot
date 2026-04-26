@@ -132,17 +132,17 @@ export function AIScoreMeter({ originalText, humanizedText }: AIScoreMeterProps)
             </p>
           </div>
           {improvement > 0 && (
-            <div className="ml-auto flex items-center gap-1.5 bg-green-50 border border-green-200 rounded-full px-3 py-1">
-              <ShieldCheck className="h-4 w-4 text-green-600" />
-              <span className="text-xs font-semibold text-green-700">
+            <div className="ml-auto flex items-center gap-1.5 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-700 rounded-full px-3 py-1">
+              <ShieldCheck className="h-4 w-4 text-green-600 dark:text-green-400" />
+              <span className="text-xs font-semibold text-green-700 dark:text-green-300">
                 -{improvement}% AI detected
               </span>
             </div>
           )}
           {improvement <= 0 && (
-            <div className="ml-auto flex items-center gap-1.5 bg-red-50 border border-red-200 rounded-full px-3 py-1">
-              <ShieldAlert className="h-4 w-4 text-red-500" />
-              <span className="text-xs font-semibold text-red-600">No improvement</span>
+            <div className="ml-auto flex items-center gap-1.5 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 rounded-full px-3 py-1">
+              <ShieldAlert className="h-4 w-4 text-red-500 dark:text-red-400" />
+              <span className="text-xs font-semibold text-red-600 dark:text-red-300">No improvement</span>
             </div>
           )}
         </div>
