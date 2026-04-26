@@ -21,7 +21,7 @@ export const CreditUsage = ({ profile }: CreditUsageProps) => {
       <CardHeader className="pb-2">
         <CardTitle>Credit Usage</CardTitle>
         <CardDescription>
-          {profile.credits_used} of {profile.credits_total} credits used
+          {profile.credits} credits remaining on {profile.plan} plan
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -39,16 +39,16 @@ export const CreditUsage = ({ profile }: CreditUsageProps) => {
               </div>
             )}
           </div>
-          
+
           {/* Credits Section */}
           <div className="space-y-2">
-            <Progress 
-              value={(profile.credits_used / profile.credits_total) * 100} 
+            <Progress
+              value={Math.max(0, 100 - (profile.credits / (profile.plan === 'enterprise' ? 500 : profile.plan === 'pro' ? 100 : 10)) * 100)}
               className="h-2"
             />
             <div className="text-xs text-muted-foreground flex justify-between">
               <span>
-                {profile.credits_total - profile.credits_used} credits remaining
+                {profile.credits} credits remaining
               </span>
               <span className="capitalize">
                 {profile.plan} Plan

@@ -51,7 +51,7 @@ export function useTextHumanization() {
       // Get user profile to check credits
       const profile = await getProfile(user.id);
       
-      if (profile.credits_used >= profile.credits_total) {
+      if (profile.credits <= 0) {
         toast({
           title: "No credits remaining",
           description: "You've used all your available credits. Please upgrade your plan.",
@@ -101,14 +101,14 @@ export function useTextHumanization() {
       // Save the humanization to the database
       await createHumanization(user.id, text, resultText);
 
-      // Update user credits
+      // Decrement user credits by 1
       await updateProfile(user.id, {
-        credits_used: profile.credits_used + 1,
+        credits: profile.credits - 1,
       });
 
       toast({
         title: "Text humanized",
-        description: "Your text has been successfully humanized with OpenAI.",
+        description: "Your text has been successfully humanized with Gemini.",
       });
       
       // Call the success callback if provided
@@ -128,7 +128,7 @@ export function useTextHumanization() {
       } else if (errorMessage.includes("timed out")) {
         errorMessage = "The humanization process took too long. Please try again with a shorter text.";
       } else if (errorMessage.includes("API Error")) {
-        errorMessage = "The OpenAI service is currently unavailable. Please try again later.";
+        errorMessage = "The Gemini service is currently unavailable. Please try again later.";
       }
       
       toast({

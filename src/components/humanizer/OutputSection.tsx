@@ -39,7 +39,7 @@ export function OutputSection({ outputText, isHumanizing }: OutputSectionProps) 
           <div className="flex flex-col items-center justify-center h-full">
             <Loader className="h-8 w-8 animate-spin mb-4 text-primary" />
             <p className="text-muted-foreground text-center">
-              Processing your text with OpenAI...
+              Processing your text with Gemini...
             </p>
             <p className="text-sm text-muted-foreground text-center mt-2">
               This may take a moment

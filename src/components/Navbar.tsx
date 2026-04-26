@@ -19,6 +19,26 @@ export function Navbar() {
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center gap-6 md:gap-8">
           <Link to="/" className="flex items-center space-x-2">
+            {/* Logo icon */}
+            <svg width="34" height="34" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="navLogoGrad" x1="0" y1="0" x2="34" y2="34" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stopColor="#8B5CF6" />
+                  <stop offset="100%" stopColor="#4F46E5" />
+                </linearGradient>
+              </defs>
+              {/* Rounded background */}
+              <rect width="34" height="34" rx="9" fill="url(#navLogoGrad)" />
+              {/* Pen / wand body */}
+              <line x1="10" y1="26" x2="22" y2="10" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+              {/* Pen tip */}
+              <polygon points="22,10 25,8 24,12" fill="white" opacity="0.95" />
+              {/* Sparkle top-right */}
+              <path d="M26 7 L26.7 9 L29 9 L27.3 10.4 L28 12.5 L26 11.2 L24 12.5 L24.7 10.4 L23 9 L25.3 9 Z" fill="white" opacity="0.9" />
+              {/* Small dots */}
+              <circle cx="9" cy="10" r="1.3" fill="white" opacity="0.6" />
+              <circle cx="27" cy="22" r="1" fill="white" opacity="0.5" />
+            </svg>
             <span className="font-bold text-xl gradient-text">AI Humanizer</span>
           </Link>
           <nav className="hidden md:flex gap-8">

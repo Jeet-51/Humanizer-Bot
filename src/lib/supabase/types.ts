@@ -1,9 +1,9 @@
 
 export type Profile = {
-  id: string;
+  user_id: string;
+  email: string;
   username: string;
-  credits_total: number;
-  credits_used: number;
+  credits: number;
   plan: 'free' | 'pro' | 'enterprise';
   created_at: string;
   updated_at: string;
@@ -29,9 +29,8 @@ export type ContactMessage = {
 export type PaymentRecord = {
   id: string;
   user_id: string;
-  plan_id: string;
-  plan_name: string;
-  amount: string;
+  plan: string;
+  amount: number;
   created_at: string;
 };
 

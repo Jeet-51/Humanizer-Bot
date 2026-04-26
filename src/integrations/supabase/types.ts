@@ -60,29 +60,26 @@ export type Database = {
         }
         Relationships: []
       }
-      payment_history: {
+      payment_records: {
         Row: {
-          amount: string
+          amount: number
           created_at: string
           id: string
-          plan_id: string
-          plan_name: string
+          plan: string
           user_id: string
         }
         Insert: {
-          amount: string
+          amount: number
           created_at?: string
           id?: string
-          plan_id: string
-          plan_name: string
+          plan: string
           user_id: string
         }
         Update: {
-          amount?: string
+          amount?: number
           created_at?: string
           id?: string
-          plan_id?: string
-          plan_name?: string
+          plan?: string
           user_id?: string
         }
         Relationships: []
@@ -90,30 +87,30 @@ export type Database = {
       profiles: {
         Row: {
           created_at: string | null
-          credits_total: number | null
-          credits_used: number | null
-          id: string
-          plan: string | null
+          credits: number
+          email: string
+          plan: string
           updated_at: string | null
-          username: string | null
+          user_id: string
+          username: string
         }
         Insert: {
           created_at?: string | null
-          credits_total?: number | null
-          credits_used?: number | null
-          id: string
-          plan?: string | null
+          credits?: number
+          email: string
+          plan?: string
           updated_at?: string | null
-          username?: string | null
+          user_id: string
+          username: string
         }
         Update: {
           created_at?: string | null
-          credits_total?: number | null
-          credits_used?: number | null
-          id?: string
-          plan?: string | null
+          credits?: number
+          email?: string
+          plan?: string
           updated_at?: string | null
-          username?: string | null
+          user_id?: string
+          username?: string
         }
         Relationships: []
       }

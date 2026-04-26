@@ -6,7 +6,7 @@ export const getProfile = async (userId: string) => {
   const { data, error } = await supabase
     .from('profiles')
     .select('*')
-    .eq('id', userId)
+    .eq('user_id', userId)
     .single();
 
   if (error) throw error;
@@ -17,7 +17,7 @@ export const updateProfile = async (userId: string, updates: Partial<Profile>) =
   const { data, error } = await supabase
     .from('profiles')
     .update(updates)
-    .eq('id', userId)
+    .eq('user_id', userId)
     .select();
 
   if (error) throw error;

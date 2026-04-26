@@ -2,15 +2,10 @@
 import { supabase } from "@/integrations/supabase/client";
 import { PaymentRecord } from "./types";
 
-export const createPaymentRecord = async (userId: string, planId: string, planName: string, amount: string) => {
+export const createPaymentRecord = async (userId: string, plan: string, amount: number) => {
   const { data, error } = await supabase
-    .from('payment_history')
-    .insert([{
-      user_id: userId,
-      plan_id: planId,
-      plan_name: planName,
-      amount
-    }])
+    .from('payment_records')
+    .insert([{ user_id: userId, plan, amount }])
     .select();
 
   if (error) throw error;
@@ -19,7 +14,7 @@ export const createPaymentRecord = async (userId: string, planId: string, planNa
 
 export const getPaymentHistory = async (userId: string) => {
   const { data, error } = await supabase
-    .from('payment_history')
+    .from('payment_records')
     .select('*')
     .eq('user_id', userId)
     .order('created_at', { ascending: false });
