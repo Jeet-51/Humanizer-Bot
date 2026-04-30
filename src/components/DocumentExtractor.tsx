@@ -39,8 +39,8 @@ export function DocumentExtractor({
   } = useTextHumanization();
 
   // Humanizer options state
-  const [readability, setReadability] = useState<string>("University");
-  const [purpose, setPurpose] = useState<string>("General Writing");
+  const [readability, setReadability] = useState<string>("Student");
+  const [purpose, setPurpose] = useState<string>("General Article");
   const [strength, setStrength] = useState<number>(0.9);
 
   const handleExtractText = async () => {

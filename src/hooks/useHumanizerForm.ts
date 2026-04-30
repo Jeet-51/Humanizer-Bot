@@ -12,8 +12,8 @@ interface UseHumanizerFormProps {
 export function useHumanizerForm({ initialText = "", initialHumanizedText = "" }: UseHumanizerFormProps) {
   const [inputText, setInputText] = useState(initialText);
   const [outputText, setOutputText] = useState(initialHumanizedText);
-  const [readability, setReadability] = useState<string>("University");
-  const [purpose, setPurpose] = useState<string>("General Writing");
+  const [readability, setReadability] = useState<string>("Student");
+  const [purpose, setPurpose] = useState<string>("General Article");
   const [strength, setStrength] = useState<number>(0.9);
   
   const { toast } = useToast();
