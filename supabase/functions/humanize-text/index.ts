@@ -38,97 +38,89 @@ function validateAndParseRequest(requestBody: any) {
   return { text, validatedReadability, validatedPurpose, validatedStrength };
 }
 
-function buildReadabilityPrompt(readability: string): string {
-  switch (readability) {
-    case "High School":
-      return "Use simple everyday vocabulary. Short punchy sentences. Nothing fancy.";
-    case "University":
-      return "Use clear, educated language — intelligent but not stiff or overly formal.";
-    case "Doctorate":
-      return "Use sophisticated academic vocabulary, but write like a real expert who thinks clearly — not like a robot quoting a textbook.";
-    case "Journalist":
-      return "Write like a journalist: crisp, direct, punchy. Hook the reader. Vary sentence length dramatically.";
-    case "Marketing":
-      return "Write like a human copywriter: persuasive, energetic, relatable. Use second-person, real benefits, and a conversational tone.";
-    default:
-      return "Use clear, natural language that sounds like an educated person wrote it.";
-  }
+function buildStyleGuide(readability: string, purpose: string): string {
+  const readabilityGuides: Record<string, string> = {
+    "High School": "Write simply. Short sentences. Common everyday words. No jargon.",
+    "University": "Write clearly and intelligently. Educated tone, not stiff. Sounds like a smart person explaining something well.",
+    "Doctorate": "Write with depth and precision. Expert vocabulary used naturally, not to show off.",
+    "Journalist": "Write crisply. Direct sentences. Strong verbs. Hook the reader fast.",
+    "Marketing": "Write persuasively. Speak to benefits. Second-person where it fits. Confident and energetic.",
+  };
+
+  const purposeGuides: Record<string, string> = {
+    "General Writing": "Conversational but coherent. Natural rhythm. Reads like a real person wrote it.",
+    "Academic": "Formal but genuine. Sounds like a researcher who actually understands their topic deeply.",
+    "Business": "Professional and direct. Like a competent colleague explaining something — no fluff, no slang.",
+    "Creative": "Vivid and rhythmic. Vary the pace. Let the writing breathe.",
+    "Technical": "Precise and confident. Clear step-by-step logic. No vague filler.",
+  };
+
+  return `Readability: ${readabilityGuides[readability] || readabilityGuides["University"]}
+Purpose: ${purposeGuides[purpose] || purposeGuides["General Writing"]}`;
 }
 
-function buildPurposePrompt(purpose: string): string {
-  switch (purpose) {
-    case "Academic":
-      return "Tone: scholarly but genuine. Sound like a student who actually understands the topic, not a language model summarizing papers.";
-    case "Business":
-      return "Tone: professional but human. Imagine a smart colleague explaining something — direct, clear, no corporate fluff.";
-    case "Creative":
-      return "Tone: vivid and personal. Use imagery, vary rhythm, let some sentences be very short. Make it feel alive.";
-    case "Technical":
-      return "Tone: precise and confident. Sound like an engineer who knows their craft — clear explanations, no padding.";
-    default:
-      return "Tone: natural and conversational, like a knowledgeable person talking to a friend.";
-  }
-}
-
-function buildStrengthPrompt(strength: number): string {
+function buildStrengthGuide(strength: number): string {
   if (strength < 0.3) {
-    return "Make light edits: fix only the most robotic phrases. Keep most of the original wording intact.";
+    return "LIGHT edit — fix only the most robotic phrases. Keep 80%+ of the original wording.";
   } else if (strength < 0.6) {
-    return "Moderate rewrite: change sentence structure and swap out AI-sounding words, but keep the core ideas close to the original.";
+    return "MODERATE rewrite — change sentence structure and word choice throughout, but keep ideas in the same order.";
   } else {
-    return "Full rewrite: completely restructure the text. Change sentence order, break up long sentences, merge short ones, rephrase everything. The final result should share the same meaning but read like a completely different writer wrote it from scratch.";
+    return "FULL rewrite — restructure sentences, vary lengths dramatically, rephrase everything. The result should share meaning with the original but sound like a completely different writer. Do NOT shorten — match the original length.";
   }
 }
 
 function buildHumanizationPrompt(readability: string, purpose: string, strength: number): string {
-  const readabilityGuide = buildReadabilityPrompt(readability);
-  const purposeGuide = buildPurposePrompt(purpose);
-  const strengthGuide = buildStrengthPrompt(strength);
+  const styleGuide = buildStyleGuide(readability, purpose);
+  const strengthGuide = buildStrengthGuide(strength);
 
-  return `You are a professional human editor who rewrites AI-generated text so it passes AI detection tools like GPTZero, Turnitin, and Originality.ai.
+  return `You are a professional editor who rewrites AI-generated text so it sounds natural and human-written, passing AI detectors like GPTZero and Turnitin.
 
-READABILITY TARGET: ${readabilityGuide}
-PURPOSE: ${purposeGuide}
-REWRITE DEPTH: ${strengthGuide}
+${styleGuide}
+Rewrite depth: ${strengthGuide}
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-CRITICAL RULES — FOLLOW EVERY ONE:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+══════════════════════════════════
+ABSOLUTE RULES — NEVER BREAK THESE
+══════════════════════════════════
 
-1. BANNED WORDS — never use any of these, even once:
-   furthermore, moreover, additionally, consequently, nevertheless,
-   therefore, thus, hence, subsequently, notably, importantly,
-   utilize, utilization, facilitate, leverage, implement, streamline,
-   optimize, prioritize, spearhead, underscore, foster, cultivate,
-   harness, catalyze, revolutionize, empower, delve, realm, tapestry,
-   paradigm, synergy, ecosystem, landscape, framework, infrastructure,
-   stakeholder, robust, comprehensive, imperative, crucial, optimal,
-   innovative, seamlessly, holistic, scalable, dynamic, proactive,
-   actionable, transformative, pivotal, groundbreaking, multifaceted,
-   nuanced, inherent, vital, paramount, indispensable, commendable,
-   significant, substantial, cutting-edge, state-of-the-art
+RULE 1 — NEVER USE THESE WORDS (not even once):
+furthermore, moreover, additionally, consequently, nevertheless,
+therefore, thus, hence, subsequently, notably, importantly,
+utilize, utilization, facilitate, leverage, streamline, spearhead,
+underscore, cultivate, harness, catalyze, revolutionize, delve,
+paradigm, synergy, ecosystem, framework, stakeholder,
+robust, comprehensive, imperative, optimal, innovative,
+seamlessly, holistically, scalable, proactive, actionable,
+transformative, pivotal, groundbreaking, multifaceted, nuanced,
+cutting-edge, state-of-the-art, game-changing, best-in-class
 
-2. SENTENCE VARIETY — this is the #1 AI tell. Mix it up hard:
-   - Follow a long sentence with a very short one. Like this.
-   - Use fragments occasionally for emphasis. Really.
-   - Vary between 6-word and 35-word sentences randomly.
-   - Start sentences differently: with "But", "So", "Yet", "The thing is,", "Here's the deal —"
+RULE 2 — VARY SENTENCE LENGTH (most important structural rule):
+- Do NOT write 5 sentences that are all the same length
+- Mix short punchy sentences (under 10 words) with longer explanatory ones (20-30 words)
+- Example rhythm: long sentence, short sentence. Medium. Long again. Short.
 
-3. SOUND HUMAN:
-   - Use contractions: don't, can't, it's, they're, you'll
-   - Add a relatable aside or observation now and then
-   - Avoid starting every sentence with "The" or a noun — mix it up
-   - Replace formal transitions with casual ones: "On top of that" not "Furthermore"
-   - Use specific numbers or details instead of vague superlatives
+RULE 3 — NATURAL TRANSITIONS (replace AI connector words):
+- NEVER start sentences with: "Furthermore," "Moreover," "Additionally," "Consequently,"
+- USE instead: "On top of that," "At the same time," "Beyond that," "Still," "That said," "In practice,"
+- Or simply connect ideas with "and," "but," "so," "yet" within sentences
+- Use contractions naturally: it's, don't, can't, they're, that's
 
-4. STRUCTURE CHANGES:
-   - Break long uniform paragraphs into shorter chunks
-   - If the original has 5 sentences all the same length, make the rewrite have 3 short + 2 long
-   - Move ideas around if it makes the writing flow more naturally
+RULE 4 — PRESERVE ALL CONTENT:
+- Every fact, idea, and detail from the original must appear in the rewrite
+- Do NOT summarize or shorten the content — match the original length
+- Do NOT add new information not present in the original
+- Do NOT end mid-sentence or leave incomplete thoughts
 
-5. PRESERVE meaning — same facts, same argument, same information. Just rewritten.
+RULE 5 — MATCH THE TONE TO PURPOSE:
+- Business = professional and direct, NOT casual or slangy
+- Academic = intelligent and precise, NOT stiff or robotic
+- Never use slang like "shook up," "without a hitch," "Here's the deal"
+- Write like an educated professional, not a text message
 
-6. OUTPUT — return ONLY the rewritten text. No preamble, no explanation, no "[", no "]".`;
+RULE 6 — OUTPUT FORMAT:
+- Return ONLY the rewritten text
+- No preamble like "Here is the rewritten text:"
+- No explanations, no bullet points unless the original had them
+- Complete every sentence — never leave a dangling phrase`;
 }
 
 async function callGeminiHumanization(text: string, readability: string, purpose: string, strength: number) {
@@ -139,8 +131,8 @@ async function callGeminiHumanization(text: string, readability: string, purpose
   }
 
   const systemPrompt = buildHumanizationPrompt(readability, purpose, strength);
-  // Higher temperature for more creative, less predictable outputs
-  const temperature = 0.4 + (strength * 0.6);
+  // Balanced temperature: creative enough to vary language, stable enough to stay complete
+  const temperature = 0.3 + (strength * 0.5);
 
   const response = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiApiKey}`,
@@ -152,11 +144,13 @@ async function callGeminiHumanization(text: string, readability: string, purpose
           parts: [{ text: systemPrompt }]
         },
         contents: [{
-          parts: [{ text: `Rewrite this text following all the rules above:\n\n${text}` }]
+          parts: [{
+            text: `Rewrite the following text according to all the rules. Preserve every idea and match the original length. Complete every sentence:\n\n${text}`
+          }]
         }],
         generationConfig: {
           temperature,
-          maxOutputTokens: 2048,
+          maxOutputTokens: 4096,
         }
       })
     }
